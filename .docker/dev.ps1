@@ -1,5 +1,3 @@
-#!/usr/bin/env pwsh
-
 param(
     [Parameter(Mandatory=$false)]
     [ValidateSet("start", "stop", "restart", "build", "logs", "shell", "composer")]
@@ -9,6 +7,7 @@ param(
 Write-Host "╔════════════════════════════════════════╗"
 Write-Host "║   SMF Docker Development Environment  ║"
 Write-Host "╚════════════════════════════════════════╝" -ForegroundColor Cyan
+Write-Host ""
 
 function Start-Services {
     Write-Host "Starting SMF Docker services..." -ForegroundColor Green
@@ -49,11 +48,35 @@ function Run-Composer {
 }
 
 switch ($Action) {
-    "start" { Start-Services }
-    "stop" { Stop-Services }
-    "restart" { Restart-Services }
-    "build" { Build-Services }
-    "logs" { Show-Logs }
-    "shell" { Access-Shell }
-    "composer" { Run-Composer }
+    "start" { 
+        Start-Services
+        break
+    }
+    "stop" { 
+        Stop-Services
+        break
+    }
+    "restart" { 
+        Restart-Services
+        break
+    }
+    "build" { 
+        Build-Services
+        break
+    }
+    "logs" { 
+        Show-Logs
+        break
+    }
+    "shell" { 
+        Access-Shell
+        break
+    }
+    "composer" { 
+        Run-Composer
+        break
+    }
+    default {
+        Start-Services
+    }
 }

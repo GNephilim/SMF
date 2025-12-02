@@ -9,9 +9,9 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./:/var/www/html
-      - ./.docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./.docker/ssl:/etc/nginx/ssl:ro
+      - ../:/var/www/html
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
     depends_on:
       - php
     networks:
@@ -23,13 +23,13 @@ services:
   # PHP-FPM Application Server
   php:
     build:
-      context: ./.docker
-      dockerfile: Dockerfile.php
+      context: ../
+      dockerfile: .docker/Dockerfile.php
     container_name: smf-php
     working_dir: /var/www/html
     volumes:
-      - ./:/var/www/html
-      - ./.docker/php.ini:/usr/local/etc/php/conf.d/custom.ini:ro
+      - ../:/var/www/html
+      - ./php.ini:/usr/local/etc/php/conf.d/custom.ini:ro
     depends_on:
       - db
     networks:
@@ -55,7 +55,7 @@ services:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
-      - ./.docker/mysql-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./mysql-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     networks:
       - smf-network
     healthcheck:
@@ -69,7 +69,7 @@ services:
     container_name: smf-composer
     working_dir: /var/www/html
     volumes:
-      - ./:/var/www/html
+      - ../:/var/www/html
     networks:
       - smf-network
     command: composer install -d

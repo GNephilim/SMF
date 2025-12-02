@@ -5,7 +5,6 @@ RUN apk add --no-cache \
     curl \
     git \
     mysql-client \
-    postgresql-client \
     bash \
     zip \
     unzip \
@@ -17,7 +16,6 @@ RUN apk add --no-cache \
 # Install PHP extensions required by SMF
 RUN docker-php-ext-install \
     pdo_mysql \
-    pdo_pgsql \
     mysqli \
     mbstring \
     fileinfo \
