@@ -72,6 +72,13 @@ Thumbs.db
 *.lnk
 ._*
 
+# Docker development files #
+############################
+.env
+.env.local
+.docker/docker-compose.override.yml
+.docker/.env
+
 # Test / Private files #
 ########################
 /nbproject/private/

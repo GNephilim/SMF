@@ -1,0 +1,100 @@
+version: '3.8'
+
+services:
+  # Web Server - Nginx
+  web:
+    image: nginx:alpine
+    container_name: smf-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./:/var/www/html
+      - ./.docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./.docker/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - php
+    networks:
+      - smf-network
+    environment:
+      - NGINX_HOST=localhost
+      - NGINX_PORT=80
+
+  # PHP-FPM Application Server
+  php:
+    build:
+      context: ./.docker
+      dockerfile: Dockerfile.php
+    container_name: smf-php
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+      - ./.docker/php.ini:/usr/local/etc/php/conf.d/custom.ini:ro
+    depends_on:
+      - db
+    networks:
+      - smf-network
+    environment:
+      - PHP_VERSION=8.2
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=smf_user
+      - DB_PASSWORD=smf_password
+      - DB_NAME=smf_db
+
+  # Database - MySQL
+  db:
+    image: mysql:8.0
+    container_name: smf-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: smf_db
+      MYSQL_USER: smf_user
+      MYSQL_PASSWORD: smf_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./.docker/mysql-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - smf-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+
+  # Composer service for dependency management
+  composer:
+    image: composer:2.6
+    container_name: smf-composer
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - smf-network
+    command: composer install -d
+    profiles:
+      - dev
+
+  # PHPMyAdmin for easy database management
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: smf-phpmyadmin
+    environment:
+      PMA_HOST: db
+      PMA_USER: smf_user
+      PMA_PASSWORD: smf_password
+      PMA_ROOT_PASSWORD: root_password
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    networks:
+      - smf-network
+
+volumes:
+  db_data:
+
+networks:
+  smf-network:
+    driver: bridge
