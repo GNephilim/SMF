@@ -25,6 +25,7 @@ services:
     build:
       context: ../
       dockerfile: .docker/Dockerfile.php
+    image: smf-php:latest
     container_name: smf
     working_dir: /var/www/html
     volumes:
